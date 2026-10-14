@@ -9,8 +9,8 @@ Team Members
 Name	Student Number
 Vian Swart 603351
 Ruan Jordaan	603551
-Member 3	XXXXXXXX
-Member 4	XXXXXXXX
+Intiesaar Allie 603504
+Tshedza Nengovhela 604226
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
