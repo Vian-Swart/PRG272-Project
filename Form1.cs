@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
 
 namespace PRG272_Project
 {
     public partial class Form1 : Form
     {
+        string textFilePath = Path.Combine(Application.StartupPath, "animals.txt");
+
         public Form1()
         {
             InitializeComponent();
@@ -22,100 +18,120 @@ namespace PRG272_Project
         {
             this.Text = "Baobab Ridge Wildlife Rehabilitation Records System";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.BackColor = Color.FromArgb(245, 247, 245);
-
-            if (lblTitle != null)
-            {
-                lblTitle.Font = new Font("Segoe UI", 16, FontStyle.Bold);
-                lblTitle.ForeColor = Color.FromArgb(44, 74, 62);
-            }
         }
 
-        private void btnOpenAdd_Click(object sender, EventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
+            SetupGridViewColumns();
+            LoadAnimalsData();
+        }
+
+        private void SetupGridViewColumns()
+        {
+            dgvAnimals.Columns.Clear();
+
+            dgvAnimals.ReadOnly = true;
+            dgvAnimals.AllowUserToAddRows = false;
+            dgvAnimals.AllowUserToDeleteRows = false;
+            dgvAnimals.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvAnimals.MultiSelect = false;
+
+            dgvAnimals.Columns.Add("id", "Animal ID");
+            dgvAnimals.Columns.Add("name", "Name");
+            dgvAnimals.Columns.Add("species", "Species");
+            dgvAnimals.Columns.Add("age", "Age");
+            dgvAnimals.Columns.Add("score", "Recovery Score");
+            dgvAnimals.Columns.Add("status", "Status");
+            dgvAnimals.Columns.Add("housing", "Housing Unit");
+        }
+
+        public void LoadAnimalsData()
+        {
+            dgvAnimals.Rows.Clear();
+            int skippedCounter = 0;
+
             try
             {
-                this.Hide();
-                frmAddAnimal addForm = new frmAddAnimal();
-                addForm.ShowDialog();
-            }
-            catch (Exception)
-            {
-                MessageBox.Show(
-                    "Error 404: The Add Animal form could not be loaded.",
-                    "Form Not Found",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }
-        }
+                if (!File.Exists(textFilePath))
+                {
+                    File.Create(textFilePath).Close();
+                    return;
+                }
 
-        private void btnOpenManage_Click(object sender, EventArgs e)
-        {
-            /*try
-            {
-                this.Hide();
-                frmManageAnimals manageForm = new frmManageAnimals();
-                manageForm.ShowDialog();
+                string[] allLines = File.ReadAllLines(textFilePath);
+
+                for (int i = 0; i < allLines.Length; i++)
+                {
+                    string currentLine = allLines[i].Trim();
+
+                    if (currentLine == "")
+                    {
+                        continue;
+                    }
+
+                    string[] dataParts = currentLine.Split('|');
+
+                    if (dataParts.Length != 7)
+                    {
+                        skippedCounter++;
+                        continue;
+                    }
+
+                    string id = dataParts[0].Trim().ToUpper();
+                    string name = dataParts[1].Trim();
+                    string species = dataParts[2].Trim();
+                    string ageInput = dataParts[3].Trim();
+                    string scoreInput = dataParts[4].Trim();
+                    string status = dataParts[5].Trim();
+                    string housing = dataParts[6].Trim();
+
+                    if (!id.StartsWith("WR-") || id.Length != 7)
+                    {
+                        skippedCounter++;
+                        continue;
+                    }
+
+                    int ageValue;
+                    int scoreValue;
+
+                    bool validAge = int.TryParse(ageInput, out ageValue);
+                    bool validScore = int.TryParse(scoreInput, out scoreValue);
+
+                    if (!validAge || ageValue < 0 || ageValue > 100)
+                    {
+                        skippedCounter++;
+                        continue;
+                    }
+
+                    if (!validScore || scoreValue < 0 || scoreValue > 100)
+                    {
+                        skippedCounter++;
+                        continue;
+                    }
+
+                    dgvAnimals.Rows.Add(id, name, species, ageValue, scoreValue, status, housing);
+                }
+
+                if (skippedCounter > 0)
+                {
+                    MessageBox.Show(skippedCounter + " malformed record(s) were skipped.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            catch (Exception)
+            catch (FileNotFoundException)
             {
-                MessageBox.Show(
-                    "Error 404: The Manage Animals form could not be loaded.",
-                    "Form Not Found",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }*/
-        }
-
-        private void btnOpenSummary_Click(object sender, EventArgs e)
-        {
-            /*try
-            {
-                this.Hide();
-                frmSummaryReport summaryForm = new frmSummaryReport();
-                summaryForm.ShowDialog();
+                MessageBox.Show("The file animals.txt was not found.", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            catch (Exception)
+            catch (UnauthorizedAccessException)
             {
-                MessageBox.Show(
-                    "Error 404: The Summary Report form could not be loaded.",
-                    "Form Not Found",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }*/
-        }
-
-        private void btnOpenView_Click(object sender, EventArgs e)
-        {
-            /*try
-            {
-                this.hide();
-                ViewAnimalsForm viewForm = new ViewAnimalsForm();
-                viewForm.ShowDialog();
+                MessageBox.Show("You do not have permission to access animals.txt.", "Permission Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            catch (Exception)
+            catch (IOException)
             {
-                MessageBox.Show(
-                    "Error 404: The View Animals form could not be loaded.",
-                    "Form Not Found",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }*/
-        }
-
-        private void btnExit_Click(object sender, EventArgs e)
-        {
-            DialogResult result = MessageBox.Show("Are you sure you want to exit?", "Exit",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
+                MessageBox.Show("The file animals.txt is currently in use by another program.", "IO Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
             {
-                Application.Exit();
+                MessageBox.Show("An unexpected error occurred: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
