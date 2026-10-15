@@ -37,6 +37,7 @@ namespace PRG272_Project
         {
             try
             {
+                this.Hide();
                 frmAddAnimal addForm = new frmAddAnimal();
                 addForm.ShowDialog();
             }
@@ -55,6 +56,7 @@ namespace PRG272_Project
         {
             /*try
             {
+                this.Hide();
                 frmManageAnimals manageForm = new frmManageAnimals();
                 manageForm.ShowDialog();
             }
@@ -73,6 +75,7 @@ namespace PRG272_Project
         {
             /*try
             {
+                this.Hide();
                 frmSummaryReport summaryForm = new frmSummaryReport();
                 summaryForm.ShowDialog();
             }
@@ -91,6 +94,7 @@ namespace PRG272_Project
         {
             /*try
             {
+                this.hide();
                 ViewAnimalsForm viewForm = new ViewAnimalsForm();
                 viewForm.ShowDialog();
             }
@@ -103,6 +107,16 @@ namespace PRG272_Project
                     MessageBoxIcon.Error
                 );
             }*/
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are you sure you want to exit?", "Exit",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
         }
     }
 }
