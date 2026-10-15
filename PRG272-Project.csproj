@@ -89,5 +89,8 @@
   <ItemGroup>
     <None Include="Resources\Add_Animal-Rescue.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="animals.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
