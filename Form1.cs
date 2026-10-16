@@ -73,7 +73,7 @@ namespace PRG272_Project
 
         private void btnOpenSummary_Click(object sender, EventArgs e)
         {
-            /*try
+            try
             {
                 this.Hide();
                 frmSummaryReport summaryForm = new frmSummaryReport();
@@ -87,7 +87,7 @@ namespace PRG272_Project
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
-            }*/
+            }
         }
 
         private void btnOpenView_Click(object sender, EventArgs e)
