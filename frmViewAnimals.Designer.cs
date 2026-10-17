@@ -35,9 +35,10 @@
             // dgvAnimals
             // 
             this.dgvAnimals.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvAnimals.Location = new System.Drawing.Point(400, 146);
+            this.dgvAnimals.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvAnimals.Location = new System.Drawing.Point(0, 0);
             this.dgvAnimals.Name = "dgvAnimals";
-            this.dgvAnimals.Size = new System.Drawing.Size(240, 150);
+            this.dgvAnimals.Size = new System.Drawing.Size(800, 450);
             this.dgvAnimals.TabIndex = 0;
             this.dgvAnimals.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
