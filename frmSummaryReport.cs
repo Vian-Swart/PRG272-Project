@@ -20,6 +20,31 @@ namespace PRG272_Project
             InitializeComponent();
 
             GenerateAndDisplaySummary();
+
+            ApplyStyling();
+        }
+
+        private void ApplyStyling()
+        {
+            // Form & Layout Colors
+            this.BackColor = Color.FromArgb(245, 247, 245); // Soft off-white / light sage tint
+            this.ForeColor = Color.FromArgb(40, 50, 40);     // Dark charcoal/slate for readability
+            this.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+
+            btnGenerate.BackColor = Color.FromArgb(46, 117, 89); // Forest Green
+            btnGenerate.ForeColor = Color.White;
+            btnGenerate.FlatStyle = FlatStyle.Flat;
+            btnGenerate.FlatAppearance.BorderSize = 0;
+            btnGenerate.Cursor = Cursors.Hand;
+            btnGenerate.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            
+            btnClose.BackColor = Color.FromArgb(220, 224, 220);
+            btnClose.ForeColor = Color.FromArgb(50, 60, 50);
+            btnClose.FlatStyle = FlatStyle.Flat;
+            btnClose.FlatAppearance.BorderSize = 0;
+            btnClose.Cursor = Cursors.Hand;
+            btnClose.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+         
         }
 
         private void GenerateAndDisplaySummary()
