@@ -92,10 +92,10 @@ namespace PRG272_Project
 
         private void btnOpenView_Click(object sender, EventArgs e)
         {
-            /*try
+            try
             {
-                this.hide();
-                ViewAnimalsForm viewForm = new ViewAnimalsForm();
+                this.Hide();
+                frmViewAnimals viewForm = new frmViewAnimals();
                 viewForm.ShowDialog();
             }
             catch (Exception)
@@ -106,7 +106,7 @@ namespace PRG272_Project
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
-            }*/
+            }
         }
 
         private void btnExit_Click(object sender, EventArgs e)
