@@ -52,24 +52,34 @@ namespace PRG272_Project
             }
         }
 
+         
         private void btnOpenManage_Click(object sender, EventArgs e)
         {
-            /*try
+            try
             {
                 this.Hide();
-                frmManageAnimals manageForm = new frmManageAnimals();
-                manageForm.ShowDialog();
+
+                using (frmManageAnimals manageForm = new frmManageAnimals())
+                {
+                    manageForm.ShowDialog();
+                }
+
+                this.Show();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                this.Show();
+
                 MessageBox.Show(
-                    "Error 404: The Manage Animals form could not be loaded.",
-                    "Form Not Found",
+                    "The Manage Animals form could not be loaded.\n" + ex.Message,
+                    "Form Loading Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
-            }*/
+            }
         }
+   
+
 
         private void btnOpenSummary_Click(object sender, EventArgs e)
         {
@@ -90,24 +100,33 @@ namespace PRG272_Project
             }*/
         }
 
-        private void btnOpenView_Click(object sender, EventArgs e)
+        
+private void btnOpenView_Click(object sender, EventArgs e)
+{
+    try
+    {
+        this.Hide();
+
+        using (frmManageAnimals viewForm = new frmManageAnimals())
         {
-            /*try
-            {
-                this.hide();
-                ViewAnimalsForm viewForm = new ViewAnimalsForm();
-                viewForm.ShowDialog();
-            }
-            catch (Exception)
-            {
-                MessageBox.Show(
-                    "Error 404: The View Animals form could not be loaded.",
-                    "Form Not Found",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }*/
+            viewForm.ShowDialog();
         }
+
+        this.Show();
+    }
+    catch (Exception ex)
+    {
+        this.Show();
+
+        MessageBox.Show(
+            "The View All Animals form could not be loaded.\n" + ex.Message,
+            "Form Loading Error",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Error
+        );
+    }
+}
+
 
         private void btnExit_Click(object sender, EventArgs e)
         {

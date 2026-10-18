@@ -58,6 +58,7 @@
     <Compile Include="frmAddAnimal.Designer.cs">
       <DependentUpon>frmAddAnimal.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmManageAnimals.cs"/>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
@@ -93,7 +94,9 @@
     <None Include="Resources\Add_Animal-Rescue.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="animals.txt" />
-  </ItemGroup>
+  <Content Include="animals.txt">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+</ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
