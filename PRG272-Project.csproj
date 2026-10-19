@@ -67,6 +67,7 @@
     <Compile Include="PresentationLayer\frmAddAnimal.Designer.cs">
       <DependentUpon>frmAddAnimal.cs</DependentUpon>
     </Compile>
+    <Compile Include="PresentationLayer\frmManageAnimals.cs" />
     <Compile Include="PresentationLayer\frmSummaryReport.cs">
       <SubType>Form</SubType>
     </Compile>
