@@ -1,3 +1,3 @@
-WR-0001|Rian|Hond|20|40|Stable|Recovery Ward
+WR-0001|SPRINKLES|HOND|20|40|STABLE|RECOVERY WARD
 WR-0004|Peanut|Parrot|3|80|Release-Ready|Pre-Release Camp
 WR-0005|Skruffie|Pigeon|2|10|Critical|Intensive Care Unit

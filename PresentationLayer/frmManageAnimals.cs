@@ -11,16 +11,33 @@ using System.Windows.Forms;
 
 namespace PRG272_Project.PresentationLayer
 {
-    public partial class frmManageAnimals: Form
+    public partial class frmManageAnimals : Form
     {
         public frmManageAnimals()
         {
             InitializeComponent();
-
+            dgvAnimals.Dock = DockStyle.Fill;
             SetupGridColumns();
-
+            AddUpdateButton();
             LoadAnimalData();
         }
+
+
+        private void AddUpdateButton()
+        {
+            Button btnUpdate = new Button();
+
+            btnUpdate.Name = "btnUpdate";
+            btnUpdate.Text = "UPDATE ANIMAL";
+            btnUpdate.Height = 40;
+            btnUpdate.Dock = DockStyle.Bottom;
+
+            btnUpdate.Click += btnUpdate_Click;
+
+            this.Controls.Add(btnUpdate);
+            btnUpdate.BringToFront();
+        }
+
 
         private void SetupGridColumns()
         {
@@ -39,33 +56,26 @@ namespace PRG272_Project.PresentationLayer
             dgvAnimals.Columns.Add("HousingUnit", "Housing Unit");
         }
 
+
         private void LoadAnimalData()
         {
-            string fileName = "animals.txt";
-            string filePath = null;
-            var currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+    
+            string filePath = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "animals.txt");
+                
+                MessageBox.Show("Grid is reading from:\n" + filePath);
 
-            while (currentDir != null)
+            if (!File.Exists(filePath))
             {
-                string candidatePath = Path.Combine(currentDir.FullName, fileName);
-                if (File.Exists(candidatePath))
-                {
-                    filePath = candidatePath;
-                    break;
-                }
-                currentDir = currentDir.Parent;
-            }
-
-            if (filePath == null || !File.Exists(filePath))
-            {
-                MessageBox.Show(
-                    "The animals.txt file could not be found anywhere in the project directories.",
+                MessageBox.Show("animals.txt could not be found.",
                     "File Not Found",
                     MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
+                    MessageBoxIcon.Warning);
                 return;
             }
+
+            dgvAnimals.Rows.Clear();
 
             try
             {
@@ -77,17 +87,45 @@ namespace PRG272_Project.PresentationLayer
                     string[] details = line.Split('|');
 
                     if (details.Length == 7)
-                    {
                         dgvAnimals.Rows.Add(details);
-                    }
                 }
             }
             catch (IOException ex)
             {
-                MessageBox.Show(
-                    "Unable to read animal records: " + ex.Message
-                );
+                MessageBox.Show("Unable to read animal records: " + ex.Message);
             }
         }
+
+
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            if (dgvAnimals.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(
+                    "Please select an animal from the grid first.",
+                    "No Animal Selected",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                return;
+            }
+
+            string[] animalDetails = new string[7];
+
+            for (int i = 0; i < 7; i++)
+            {
+                animalDetails[i] =
+                    Convert.ToString(dgvAnimals.SelectedRows[0].Cells[i].Value);
+            }
+
+            using (frmAddAnimal editForm = new frmAddAnimal(animalDetails))
+            {
+                editForm.ShowDialog();
+            }
+
+            LoadAnimalData();
+        }
+
     }
 }
