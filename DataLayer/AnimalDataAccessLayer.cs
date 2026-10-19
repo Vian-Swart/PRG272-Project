@@ -1,0 +1,88 @@
+﻿using PRG272_Project.BusinessLayer;
+using System;
+using System.IO;
+using System.Windows.Forms;
+
+namespace PRG272_Project.DataLayer
+{// begin namespace
+
+    class AnimalDataAccessLayer
+    {// begin class AnimalDataAccessLayer
+
+        // Variable for text file path
+
+        private string filePath = "animals.txt";
+
+        // Constructor
+
+        public AnimalDataAccessLayer()
+        {// begin constructor
+
+            // Check whether the text file exists
+           
+            if (!File.Exists(filePath))
+            {// begin file exists check
+
+                File.Create(filePath).Close();
+
+            }// end file exists check
+
+        }// end constructor
+
+        // Check If Animal ID Already Exists
+
+        public bool AnimalIDExists(string animalID)
+        {// begin method
+
+            string[] lines = File.ReadAllLines(filePath);
+
+            foreach (string line in lines)
+            {// begin foreach
+
+                string[] data = line.Split('|');
+
+                if (data.Length > 0)
+                {// begin if
+
+                    if (data[0].ToUpper() == animalID.ToUpper())
+                    {// begin
+                        return true;
+                    }// end
+
+                }// end if
+
+            }// end foreach
+
+            return false;
+
+        }// end method
+
+        // Add Animal To Text File
+
+        public bool AddAnimal(Animal animal)
+        {// begin method
+            try
+            {// begin try
+
+                string animalRecord = animal.AnimalID + "|" + animal.AnimalName.ToUpper() + "|" + animal.Species.ToUpper() + "|" +
+                    animal.Age + "|" + animal.Recoveryscore + "|" + animal.Status.ToUpper() + "|" + animal.Housingunit.ToUpper();
+
+                File.AppendAllText(filePath, animalRecord + Environment.NewLine);
+
+                return true;
+
+            }// end try
+
+            catch
+            {// begin catch
+
+                return false;
+
+            }// end catch
+
+        }// end method
+
+
+    }// end class AnimalDataAccessLayer
+
+}// end namespace
