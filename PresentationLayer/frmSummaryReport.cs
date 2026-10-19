@@ -27,8 +27,8 @@ namespace PRG272_Project
         private void ApplyStyling()
         {
             // Form & Layout Colors
-            this.BackColor = Color.FromArgb(245, 247, 245); // Soft off-white / light sage tint
-            this.ForeColor = Color.FromArgb(40, 50, 40);     // Dark charcoal/slate for readability
+            this.BackColor = Color.FromArgb(245, 247, 245); // Soft off-white
+            this.ForeColor = Color.FromArgb(40, 50, 40);     // Dark charcoal
             this.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
 
             btnGenerate.BackColor = Color.FromArgb(46, 117, 89); // Forest Green
@@ -49,8 +49,10 @@ namespace PRG272_Project
 
         private void GenerateAndDisplaySummary()
         {
+            //reads from the main folder root directoryreads from the main folder
+            string projectDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+            string filePath = Path.Combine(projectDirectory, "animals.txt");
 
-            string filePath = "animals.txt";
             int totalAnimals = 0;
             double totalAge = 0;
             double totalScore = 0;
@@ -105,7 +107,6 @@ namespace PRG272_Project
                     }
                 }
 
-
                 string avgAgeStr = "N/A";
                 string avgScoreStr = "N/A";
 
@@ -118,15 +119,16 @@ namespace PRG272_Project
                 }
 
                 // Update UI Labels 
-                lblAvgAgeVal.Text = avgAgeStr;
-                lblAvgScoreVal.Text = avgScoreStr;
-                lblCriticalVal.Text = countCritical.ToString();
-                lblSeriousVal.Text = countSerious.ToString();
-                lblStableVal.Text = countStable.ToString();
-                lblRecoveringVal.Text = countRecovering.ToString();
-                lblReleaseReadyVal.Text = countReleaseReady.ToString();
+                if (lblTotalAnimalsVal != null) lblTotalAnimalsVal.Text = totalAnimals.ToString();
+                if (lblAvgAgeVal != null) lblAvgAgeVal.Text = avgAgeStr;
+                if (lblAvgScoreVal != null) lblAvgScoreVal.Text = avgScoreStr;
+                if (lblCriticalVal != null) lblCriticalVal.Text = countCritical.ToString();
+                if (lblSeriousVal != null) lblSeriousVal.Text = countSerious.ToString();
+                if (lblStableVal != null) lblStableVal.Text = countStable.ToString();
+                if (lblRecoveringVal != null) lblRecoveringVal.Text = countRecovering.ToString();
+                if (lblReleaseReadyVal != null) lblReleaseReadyVal.Text = countReleaseReady.ToString();
 
-                // Export to summary.txt
+                // Export to summary.txt in the project root directory
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
 
                 List<string> summaryLines = new List<string>
@@ -153,26 +155,22 @@ namespace PRG272_Project
                     countReleaseReady.ToString()
                 };
 
-                // Navigate up from bin/Debug (or bin/Release) to the main project directory
-                string projectDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
                 string summaryFilePath = Path.Combine(projectDirectory, "summary.txt");
-
-                // Write the lines to the project root folder instead
                 File.WriteAllLines(summaryFilePath, summaryLines);
 
                 MessageBox.Show("Summary report successfully generated and exported to summary.txt.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (IOException ioEx)
             {
-                MessageBox.Show($"File error while generating summary: {ioEx.Message}","File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"File error while generating summary: {ioEx.Message}", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (UnauthorizedAccessException uaEx)
             {
-                MessageBox.Show($"Permission denied: {uaEx.Message}","Access Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Permission denied: {uaEx.Message}", "Access Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}","Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

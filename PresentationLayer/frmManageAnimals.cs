@@ -43,49 +43,81 @@ namespace PRG272_Project.PresentationLayer
         {
             string fileName = "animals.txt";
             string filePath = null;
-            var currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-
-            while (currentDir != null)
-            {
-                string candidatePath = Path.Combine(currentDir.FullName, fileName);
-                if (File.Exists(candidatePath))
-                {
-                    filePath = candidatePath;
-                    break;
-                }
-                currentDir = currentDir.Parent;
-            }
-
-            if (filePath == null || !File.Exists(filePath))
-            {
-                MessageBox.Show(
-                    "The animals.txt file could not be found anywhere in the project directories.",
-                    "File Not Found",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning
-                );
-                return;
-            }
 
             try
             {
-                foreach (string line in File.ReadLines(filePath))
+                // Checks the main project root folder first
+                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var parentDir = Directory.GetParent(baseDirectory);
+
+                if (parentDir != null && parentDir.Parent != null)
+                {
+                    string projectRootPath = Path.Combine(parentDir.Parent.FullName, fileName);
+                    if (File.Exists(projectRootPath))
+                    {
+                        filePath = projectRootPath;
+                    }
+                }
+
+                // Fallback: Check standard directory traversal if not in root folder
+                if (filePath == null || !File.Exists(filePath))
+                {
+                    var currentDir = new DirectoryInfo(baseDirectory);
+                    while (currentDir != null)
+                    {
+                        string candidatePath = Path.Combine(currentDir.FullName, fileName);
+                        
+                        if (!candidatePath.Contains("\\bin\\") && !candidatePath.Contains("\\obj\\") && File.Exists(candidatePath))
+                        {
+                            filePath = candidatePath;
+                            break;
+                        }
+                        currentDir = currentDir.Parent;
+                    }
+                }
+
+                if (filePath == null || !File.Exists(filePath))
+                {
+                    MessageBox.Show(
+                        "The animals.txt file could not be found in the project root directory.",
+                        "File Not Found",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                    return;
+                }
+
+                dgvAnimals.Rows.Clear();
+                string[] allLines = File.ReadAllLines(filePath);
+
+                foreach (string line in allLines)
                 {
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
 
-                    string[] details = line.Split('|');
+                    string[] parts = line.Split('|');
 
-                    if (details.Length == 7)
+                    if (parts.Length >= 7)
                     {
-                        dgvAnimals.Rows.Add(details);
+                        dgvAnimals.Rows.Add(
+                            parts[0].Trim(),
+                            parts[1].Trim(),
+                            parts[2].Trim(),
+                            parts[3].Trim(),
+                            parts[4].Trim(),
+                            parts[5].Trim(),
+                            parts[6].Trim()
+                        );
                     }
                 }
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Unable to read animal records: " + ex.Message
+                    "Error loading animal records: " + ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
                 );
             }
         }
