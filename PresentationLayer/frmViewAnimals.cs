@@ -11,6 +11,17 @@ namespace PRG272_Project
         public frmViewAnimals()
         {
             InitializeComponent();
+
+            try
+            {
+                string projectDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+                textFilePath = Path.Combine(projectDirectory, "animals.txt");
+            }
+            catch
+            {
+                // Fallback to startup path if parent resolution fails
+                textFilePath = Path.Combine(Application.StartupPath, "animals.txt");
+            }
         }
 
         private void frmViewAnimals_Load(object sender, EventArgs e)
@@ -47,7 +58,9 @@ namespace PRG272_Project
             {
                 if (!File.Exists(textFilePath))
                 {
-                    File.Create(textFilePath).Close();
+                    // Create file if it doesn't exist yet
+                    File.WriteAllText(textFilePath, "");
+                    MessageBox.Show("animals.txt was not found, a new one has been created.", "Notice", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
 
