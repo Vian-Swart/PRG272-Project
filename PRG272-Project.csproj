@@ -55,6 +55,9 @@
     <Compile Include="PresentationLayer\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="PresentationLayer\frmManageAnimals.Designer.cs">
+      <DependentUpon>frmManageAnimals.cs</DependentUpon>
+    </Compile>
     <Compile Include="PresentationLayer\frmViewAnimals.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,7 +70,9 @@
     <Compile Include="PresentationLayer\frmAddAnimal.Designer.cs">
       <DependentUpon>frmAddAnimal.cs</DependentUpon>
     </Compile>
-    <Compile Include="PresentationLayer\frmManageAnimals.cs" />
+    <Compile Include="PresentationLayer\frmManageAnimals.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="PresentationLayer\frmSummaryReport.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -81,6 +86,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PresentationLayer\frmAddAnimal.resx">
       <DependentUpon>frmAddAnimal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PresentationLayer\frmManageAnimals.resx">
+      <DependentUpon>frmManageAnimals.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PresentationLayer\frmViewAnimals.resx">
       <DependentUpon>frmViewAnimals.cs</DependentUpon>

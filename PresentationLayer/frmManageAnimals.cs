@@ -1,32 +1,34 @@
-
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace PRG272_Project
+namespace PRG272_Project.PresentationLayer
 {
-    public class frmManageAnimals : Form
+    public partial class frmManageAnimals: Form
     {
-        private DataGridView dgvAnimals;
-
         public frmManageAnimals()
         {
-            Text = "Manage Animals";
-            Size = new Size(1000, 450);
-            StartPosition = FormStartPosition.CenterScreen;
+            InitializeComponent();
 
-            dgvAnimals = new DataGridView
-            {
-                Dock = DockStyle.Fill,
-                ReadOnly = true,
-                AllowUserToAddRows = false,
-                AutoSizeColumnsMode =
-                    DataGridViewAutoSizeColumnsMode.Fill,
-                SelectionMode =
-                    DataGridViewSelectionMode.FullRowSelect,
-                MultiSelect = false
-            };
+            SetupGridColumns();
+
+            LoadAnimalData();
+        }
+
+        private void SetupGridColumns()
+        {
+            dgvAnimals.ReadOnly = true;
+            dgvAnimals.AllowUserToAddRows = false;
+            dgvAnimals.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvAnimals.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvAnimals.MultiSelect = false;
 
             dgvAnimals.Columns.Add("AnimalID", "Animal ID");
             dgvAnimals.Columns.Add("Name", "Name");
@@ -35,23 +37,29 @@ namespace PRG272_Project
             dgvAnimals.Columns.Add("RecoveryScore", "Recovery Score");
             dgvAnimals.Columns.Add("Status", "Status");
             dgvAnimals.Columns.Add("HousingUnit", "Housing Unit");
-
-            Controls.Add(dgvAnimals);
-
-            LoadAnimalData();
         }
 
         private void LoadAnimalData()
         {
-            string filePath = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "animals.txt"
-            );
+            string fileName = "animals.txt";
+            string filePath = null;
+            var currentDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
 
-            if (!File.Exists(filePath))
+            while (currentDir != null)
+            {
+                string candidatePath = Path.Combine(currentDir.FullName, fileName);
+                if (File.Exists(candidatePath))
+                {
+                    filePath = candidatePath;
+                    break;
+                }
+                currentDir = currentDir.Parent;
+            }
+
+            if (filePath == null || !File.Exists(filePath))
             {
                 MessageBox.Show(
-                    "The animals.txt file could not be found.",
+                    "The animals.txt file could not be found anywhere in the project directories.",
                     "File Not Found",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning

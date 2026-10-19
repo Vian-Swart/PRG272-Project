@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PRG272_Project.PresentationLayer;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -54,7 +55,7 @@ namespace PRG272_Project
 
         private void btnOpenManage_Click(object sender, EventArgs e)
         {
-            /*try
+            try
             {
                 this.Hide();
                 frmManageAnimals manageForm = new frmManageAnimals();
@@ -68,7 +69,7 @@ namespace PRG272_Project
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
-            }*/
+            }
         }
 
         private void btnOpenSummary_Click(object sender, EventArgs e)
