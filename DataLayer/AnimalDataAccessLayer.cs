@@ -82,50 +82,6 @@ namespace PRG272_Project.DataLayer
 
         }// end method
 
-        
-public bool UpdateAnimal(string originalAnimalID, Animal updatedAnimal)
-{
-    try
-    {
-        string[] lines = File.ReadAllLines(filePath);
-        bool found = false;
-
-        string updatedRecord =
-            updatedAnimal.AnimalID + "|" +
-            updatedAnimal.AnimalName.ToUpper() + "|" +
-            updatedAnimal.Species.ToUpper() + "|" +
-            updatedAnimal.Age + "|" +
-            updatedAnimal.Recoveryscore + "|" +
-            updatedAnimal.Status.ToUpper() + "|" +
-            updatedAnimal.Housingunit.ToUpper();
-
-        for (int i = 0; i < lines.Length; i++)
-        {
-            string[] data = lines[i].Split('|');
-
-            if (data.Length == 7 &&
-                data[0].Equals(originalAnimalID,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                lines[i] = updatedRecord;
-                found = true;
-                break;
-            }
-        }
-
-        if (!found)
-            return false;
-
-        File.WriteAllLines(filePath, lines);
-        return true;
-    }
-    catch
-    {
-        return false;
-    }
-}
-
-
 
     }// end class AnimalDataAccessLayer
 
