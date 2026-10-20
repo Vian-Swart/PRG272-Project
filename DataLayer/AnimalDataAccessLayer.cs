@@ -12,24 +12,45 @@ namespace PRG272_Project.DataLayer
 
         // Variable for text file path
 
-        private string filePath =
-    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "animals.txt");
+        private string filePath;
 
         // Constructor
 
         public AnimalDataAccessLayer()
-        {// begin constructor
+        {
+            try
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                var directoryInfo = new DirectoryInfo(baseDir);
+                string projectDirectory = baseDir;
 
-            // Check whether the text file exists
+                while (directoryInfo != null)
+                {
+                    if (directoryInfo.GetFiles("*.sln").Length > 0 || directoryInfo.GetFiles("*.csproj").Length > 0)
+                    {
+                        projectDirectory = directoryInfo.FullName;
+                        break;
+                    }
+                    directoryInfo = directoryInfo.Parent;
+                }
+
+                filePath = Path.Combine(projectDirectory, "animals.txt");
+            }
+            catch
+            {
+                filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "animals.txt");
+            }
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                filePath = "animals.txt";
+            }
 
             if (!File.Exists(filePath))
-            {// begin file exists check
-
+            {
                 File.Create(filePath).Close();
-
-            }// end file exists check
-
-        }// end constructor
+            }
+        }
 
         // Check If Animal ID Already Exists
 
@@ -163,6 +184,45 @@ namespace PRG272_Project.DataLayer
             catch
             {
                 return false;
+            }
+        }
+
+        public string GetNextAnimalID()
+        {
+            try
+            {
+                if (!File.Exists(filePath)) return "WR-0001";
+
+                string[] lines = File.ReadAllLines(filePath);
+                int maxIdNum = 0;
+
+                foreach (string line in lines)
+                {
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    string[] data = line.Split('|');
+
+                    if (data.Length > 0)
+                    {
+                        string id = data[0].Trim();
+
+                        if (id.StartsWith("WR-", StringComparison.OrdinalIgnoreCase))
+                        {
+                            string numPart = id.Substring(3);
+                            if (int.TryParse(numPart, out int num))
+                            {
+                                if (num > maxIdNum) maxIdNum = num;
+                            }
+                        }
+                    }
+                }
+
+                int nextNum = maxIdNum + 1;
+                return $"WR-{nextNum:D4}";
+            }
+            catch
+            {
+                return "WR-0001";
             }
         }
 

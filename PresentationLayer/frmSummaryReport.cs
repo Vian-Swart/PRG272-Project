@@ -136,23 +136,17 @@ namespace PRG272_Project
                     "BAOBAB RIDGE WILDLIFE REHABILITATION CENTRE",
                     "ANIMAL SUMMARY REPORT",
                     $"Generated: {timestamp}",
-                    "Total animals:",
-                    totalAnimals.ToString(),
-                    "Average age (years):",
-                    avgAgeStr,
-                    "Average recovery score:",
-                    avgScoreStr,
+                    "----------------------------------------",
+                    $"Total animals:".PadRight(25) + totalAnimals.ToString(),
+                    $"Average age (years):".PadRight(25) + avgAgeStr,
+                    $"Average recovery score:".PadRight(25) + avgScoreStr,
+                    "----------------------------------------",
                     "Animals per status:",
-                    "Critical:",
-                    countCritical.ToString(),
-                    "Serious:",
-                    countSerious.ToString(),
-                    "Stable:",
-                    countStable.ToString(),
-                    "Recovering:",
-                    countRecovering.ToString(),
-                    "Release-Ready:",
-                    countReleaseReady.ToString()
+                    $"  Critical:".PadRight(25) + countCritical.ToString(),
+                    $"  Serious:".PadRight(25) + countSerious.ToString(),
+                    $"  Stable:".PadRight(25) + countStable.ToString(),
+                    $"  Recovering:".PadRight(25) + countRecovering.ToString(),
+                    $"  Release-Ready:".PadRight(25) + countReleaseReady.ToString()
                 };
 
                 string summaryFilePath = Path.Combine(projectDirectory, "summary.txt");
