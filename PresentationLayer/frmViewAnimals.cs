@@ -26,7 +26,6 @@ namespace PRG272_Project
 
         private void frmViewAnimals_Load(object sender, EventArgs e)
         {
-            MessageBox.Show("View Animals is reading from:\n" + textFilePath);
             SetupGridViewColumns();
             LoadAnimalsData();
         }
