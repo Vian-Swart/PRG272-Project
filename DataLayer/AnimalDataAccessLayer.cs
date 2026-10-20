@@ -209,7 +209,7 @@ namespace PRG272_Project.DataLayer
                         if (id.StartsWith("WR-", StringComparison.OrdinalIgnoreCase))
                         {
                             string numPart = id.Substring(3);
-                            if (int.TryParse(numPart, out int num))git checkout feature/Manage-Animal-(Intiesaar-Branch)
+                            if (int.TryParse(numPart, out int num))
                             {
                                 if (num > maxIdNum) maxIdNum = num;
                             }
