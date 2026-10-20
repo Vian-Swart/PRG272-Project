@@ -2,16 +2,18 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace PRG272_Project.DataLayer
 {// begin namespace
 
-    class AnimalDataAccessLayer
+    public class AnimalDataAccessLayer
     {// begin class AnimalDataAccessLayer
 
         // Variable for text file path
 
-        private string filePath = "animals.txt";
+        private string filePath =
+    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "animals.txt");
 
         // Constructor
 
@@ -19,7 +21,7 @@ namespace PRG272_Project.DataLayer
         {// begin constructor
 
             // Check whether the text file exists
-           
+
             if (!File.Exists(filePath))
             {// begin file exists check
 
@@ -82,49 +84,87 @@ namespace PRG272_Project.DataLayer
 
         }// end method
 
-        
-public bool UpdateAnimal(string originalAnimalID, Animal updatedAnimal)
-{
-    try
-    {
-        string[] lines = File.ReadAllLines(filePath);
-        bool found = false;
 
-        string updatedRecord =
-            updatedAnimal.AnimalID + "|" +
-            updatedAnimal.AnimalName.ToUpper() + "|" +
-            updatedAnimal.Species.ToUpper() + "|" +
-            updatedAnimal.Age + "|" +
-            updatedAnimal.Recoveryscore + "|" +
-            updatedAnimal.Status.ToUpper() + "|" +
-            updatedAnimal.Housingunit.ToUpper();
-
-        for (int i = 0; i < lines.Length; i++)
+        public bool UpdateAnimal(string originalAnimalID, Animal updatedAnimal)
         {
-            string[] data = lines[i].Split('|');
-
-            if (data.Length == 7 &&
-                data[0].Equals(originalAnimalID,
-                    StringComparison.OrdinalIgnoreCase))
+            try
             {
-                lines[i] = updatedRecord;
-                found = true;
-                break;
+                string[] lines = File.ReadAllLines(filePath);
+                bool found = false;
+
+                string updatedRecord =
+                    updatedAnimal.AnimalID + "|" +
+                    updatedAnimal.AnimalName.ToUpper() + "|" +
+                    updatedAnimal.Species.ToUpper() + "|" +
+                    updatedAnimal.Age + "|" +
+                    updatedAnimal.Recoveryscore + "|" +
+                    updatedAnimal.Status.ToUpper() + "|" +
+                    updatedAnimal.Housingunit.ToUpper();
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string[] data = lines[i].Split('|');
+
+                    if (data.Length == 7 &&
+                        data[0].Equals(originalAnimalID,
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        lines[i] = updatedRecord;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                    return false;
+
+                File.WriteAllLines(filePath, lines);
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
-        if (!found)
-            return false;
+        // Delete Animal From Text File
 
-        File.WriteAllLines(filePath, lines);
-        return true;
-    }
-    catch
-    {
-        return false;
-    }
-}
+        public bool DeleteAnimal(string animalID)
+        {
+            try
+            {
+                string[] lines = File.ReadAllLines(filePath);
+                bool found = false;
 
+                List<string> remainingLines = new List<string>();
+
+                foreach (string line in lines)
+                {
+                    string[] data = line.Split('|');
+
+                    if (data.Length == 7 &&
+                        data[0].Equals(animalID,
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        found = true;
+                    }
+                    else
+                    {
+                        remainingLines.Add(line);
+                    }
+                }
+
+                if (!found)
+                    return false;
+
+                File.WriteAllLines(filePath, remainingLines);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
 
     }// end class AnimalDataAccessLayer
