@@ -12,18 +12,51 @@ using System.Windows.Forms;
 
 namespace PRG272_Project.PresentationLayer
 {
-    public partial class frmManageAnimals: Form
+    public partial class frmManageAnimals : Form
     {
-
-
         public frmManageAnimals()
         {
             InitializeComponent();
 
             SetupGridColumns();
-
+            CreateButtonPanel();
             LoadAnimalData();
         }
+
+
+        private void CreateButtonPanel()
+        {
+            Panel buttonPanel = new Panel();
+
+            buttonPanel.Name = "buttonPanel";
+            buttonPanel.Height = 50;
+            buttonPanel.Dock = DockStyle.Bottom;
+
+            Button btnUpdate = new Button();
+
+            btnUpdate.Name = "btnUpdate";
+            btnUpdate.Text = "UPDATE ANIMAL";
+            btnUpdate.Width = 150;
+            btnUpdate.Dock = DockStyle.Left;
+            btnUpdate.Click += btnUpdate_Click;
+
+            Button btnDelete = new Button();
+
+            btnDelete.Name = "btnDelete";
+            btnDelete.Text = "DELETE ANIMAL";
+            btnDelete.Width = 150;
+            btnDelete.Dock = DockStyle.Right;
+            btnDelete.Click += btnDelete_Click;
+
+            buttonPanel.Controls.Add(btnUpdate);
+            buttonPanel.Controls.Add(btnDelete);
+
+            this.Controls.Add(buttonPanel);
+            buttonPanel.BringToFront();
+
+            dgvAnimals.Dock = DockStyle.Fill;
+        }
+
 
         private void SetupGridColumns()
         {
@@ -41,6 +74,7 @@ namespace PRG272_Project.PresentationLayer
             dgvAnimals.Columns.Add("Status", "Status");
             dgvAnimals.Columns.Add("HousingUnit", "Housing Unit");
         }
+
 
         private void LoadAnimalData()
         {
@@ -65,6 +99,7 @@ namespace PRG272_Project.PresentationLayer
                 filePath = Path.Combine(projectDirectory, "animals.txt");
 
                 dgvAnimals.Rows.Clear();
+                string[] allLines = File.ReadAllLines(filePath);
 
                 if (!File.Exists(filePath))
                 {
@@ -77,22 +112,29 @@ namespace PRG272_Project.PresentationLayer
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
 
-                    string[] details = line.Split('|');
+                    string[] parts = line.Split('|');
 
                     if (details.Length >= 7)
                     {
-                        dgvAnimals.Rows.Add(details);
+                        dgvAnimals.Rows.Add(
+                            parts[0].Trim(),
+                            parts[1].Trim(),
+                            parts[2].Trim(),
+                            parts[3].Trim(),
+                            parts[4].Trim(),
+                            parts[5].Trim(),
+                            parts[6].Trim()
+                        );
                     }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Error loading animal records: " + ex.Message,
+                    "Unable to read animal records: " + ex.Message,
                     "Error",
                     MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
+                    MessageBoxIcon.Error);
             }
         }
 

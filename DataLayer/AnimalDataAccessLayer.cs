@@ -2,12 +2,11 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 namespace PRG272_Project.DataLayer
 {// begin namespace
 
-    public class AnimalDataAccessLayer
+    class AnimalDataAccessLayer
     {// begin class AnimalDataAccessLayer
 
         // Variable for text file path
