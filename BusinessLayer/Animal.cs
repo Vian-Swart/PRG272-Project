@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace PRG272_Project.BusinessLayer
 {// begin namesapce 
-     class Animal
+     public class Animal
     {// begin class animal 
 
         // Variables for the AddAnimal function
