@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PRG272_Project.DataLayer;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -77,74 +78,43 @@ namespace PRG272_Project.PresentationLayer
 
         private void LoadAnimalData()
         {
-            string filePath = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "animals.txt");
-
-            if (!File.Exists(filePath))
-            {
-                MessageBox.Show(
-                    "animals.txt could not be found.",
-                    "File Not Found",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return;
-            }
+            string filePath = "";
 
             try
             {
-                // Checks the main project root folder first
-                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                var parentDir = Directory.GetParent(baseDirectory);
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                var directoryInfo = new DirectoryInfo(baseDir);
 
-                if (parentDir != null && parentDir.Parent != null)
+                string projectDirectory = baseDir;
+                while (directoryInfo != null)
                 {
-                    string projectRootPath = Path.Combine(parentDir.Parent.FullName, fileName);
-                    if (File.Exists(projectRootPath))
+                    if (directoryInfo.GetFiles("*.sln").Length > 0 || directoryInfo.GetFiles("*.csproj").Length > 0)
                     {
-                        filePath = projectRootPath;
+                        projectDirectory = directoryInfo.FullName;
+                        break;
                     }
+                    directoryInfo = directoryInfo.Parent;
                 }
 
-                // Fallback: Check standard directory traversal if not in root folder
-                if (filePath == null || !File.Exists(filePath))
-                {
-                    var currentDir = new DirectoryInfo(baseDirectory);
-                    while (currentDir != null)
-                    {
-                        string candidatePath = Path.Combine(currentDir.FullName, fileName);
-                        
-                        if (!candidatePath.Contains("\\bin\\") && !candidatePath.Contains("\\obj\\") && File.Exists(candidatePath))
-                        {
-                            filePath = candidatePath;
-                            break;
-                        }
-                        currentDir = currentDir.Parent;
-                    }
-                }
-
-                if (filePath == null || !File.Exists(filePath))
-                {
-                    MessageBox.Show(
-                        "The animals.txt file could not be found in the project root directory.",
-                        "File Not Found",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning
-                    );
-                    return;
-                }
+                filePath = Path.Combine(projectDirectory, "animals.txt");
 
                 dgvAnimals.Rows.Clear();
                 string[] allLines = File.ReadAllLines(filePath);
 
-                foreach (string line in allLines)
+                if (!File.Exists(filePath))
+                {
+                    File.Create(filePath).Close();
+                    return;
+                }
+
+                foreach (string line in File.ReadLines(filePath))
                 {
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
 
                     string[] parts = line.Split('|');
 
-                    if (details.Length == 7)
+                    if (details.Length >= 7)
                     {
                         dgvAnimals.Rows.Add(
                             parts[0].Trim(),
@@ -168,87 +138,65 @@ namespace PRG272_Project.PresentationLayer
             }
         }
 
-
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             if (dgvAnimals.SelectedRows.Count == 0)
             {
-                MessageBox.Show(
-                    "Please select an animal from the grid first.",
-                    "No Animal Selected",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-
+                MessageBox.Show("Please select an animal record from the grid before clicking update.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            string[] animalDetails = new string[7];
+            DataGridViewRow selectedRow = dgvAnimals.SelectedRows[0];
+            string id = selectedRow.Cells["AnimalID"].Value.ToString();
+            string name = selectedRow.Cells["Name"].Value.ToString();
+            string species = selectedRow.Cells["Species"].Value.ToString();
 
-            for (int i = 0; i < 7; i++)
+            int.TryParse(selectedRow.Cells["Age"].Value.ToString(), out int age);
+            int.TryParse(selectedRow.Cells["RecoveryScore"].Value.ToString(), out int score);
+
+            frmAddAnimal editForm = new frmAddAnimal(id, name, species, age, score);
+
+            if (editForm.ShowDialog() == DialogResult.OK)
             {
-                animalDetails[i] =
-                    Convert.ToString(
-                        dgvAnimals.SelectedRows[0].Cells[i].Value);
+                LoadAnimalData();
             }
-
-            using (frmAddAnimal editForm = new frmAddAnimal(animalDetails))
-            {
-                editForm.ShowDialog();
-            }
-
-            LoadAnimalData();
         }
-
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (dgvAnimals.SelectedRows.Count == 0)
             {
-                MessageBox.Show(
-                    "Please select an animal to delete.",
-                    "No Animal Selected",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                MessageBox.Show("Please select an animal record from the grid to delete.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            string animalID = Convert.ToString(
-                dgvAnimals.SelectedRows[0].Cells[0].Value);
+            DataGridViewRow selectedRow = dgvAnimals.SelectedRows[0];
+            string animalID = selectedRow.Cells["AnimalID"].Value?.ToString();
 
-            DialogResult result = MessageBox.Show(
-                "Are you sure you want to delete animal " + animalID + "?",
-                "Confirm Delete",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
+            if (string.IsNullOrEmpty(animalID)) return;
 
-            if (result != DialogResult.Yes)
-                return;
+            DialogResult confirmResult = MessageBox.Show($"Are you sure you want to delete animal record {animalID}?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-            PRG272_Project.DataLayer.AnimalDataAccessLayer animalDAL =
-                new PRG272_Project.DataLayer.AnimalDataAccessLayer();
-
-            bool deleted = animalDAL.DeleteAnimal(animalID);
-
-            if (deleted)
+            if (confirmResult == DialogResult.Yes)
             {
-                MessageBox.Show(
-                    "Animal deleted successfully.",
-                    "Success",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-
-                LoadAnimalData();
-            }
-            else
-            {
-                MessageBox.Show(
-                    "The animal could not be deleted.",
-                    "Delete Failed",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                AnimalDataAccessLayer animalDAL = new AnimalDataAccessLayer();
+                if (animalDAL.DeleteAnimal(animalID))
+                {
+                    MessageBox.Show("Animal record deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadAnimalData();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to delete the animal record from the text file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
-
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Form1 frmMain = new Form1();
+            frmMain.Show();
+            this.Close();
+        }
     }
 }

@@ -9,30 +9,43 @@ namespace PRG272_Project
     public partial class frmAddAnimal : Form
     {// begin public partial class
 
-        private bool isUpdateMode = false;
+        private bool isEditMode = false;
         private string originalAnimalID = "";
+
         public frmAddAnimal()
         {// begin constructor
 
             InitializeComponent();
+            isEditMode = false;
+
+            // Automatically generate the next Animal ID
+            AnimalDataAccessLayer animalDAL = new AnimalDataAccessLayer();
+            txtAnimal_ID.Text = animalDAL.GetNextAnimalID();
+            txtAnimal_ID.Enabled = false; // Lock the ID field so it cannot be changed
 
         }// end constructor
 
-        public frmAddAnimal(string[] animalDetails)
+        public frmAddAnimal(string id, string name, string species, int age, int score)
         {
             InitializeComponent();
+            isEditMode = true;
+            originalAnimalID = id;
 
-            isUpdateMode = true;
-            originalAnimalID = animalDetails[0];
+            // Pre-fill textboxes with selected row data
+            txtAnimal_ID.Text = id;
+            txtAnimal_ID.Enabled = false; // Prevent modifying ID
+            txtAnimal_Name.Text = name;
+            txtAnimal_Species.Text = species;
+            txtAnimal_Age.Text = age.ToString();
+            txtAnimal_Recovery_Score.Text = score.ToString();
 
-            txtAnimal_ID.Text = animalDetails[0];
-            txtAnimal_Name.Text = animalDetails[1];
-            txtAnimal_Species.Text = animalDetails[2];
-            txtAnimal_Age.Text = animalDetails[3];
-            txtAnimal_Recovery_Score.Text = animalDetails[4];
-            txt_Animal_Status.Text = animalDetails[5];
-            txt_Housing_Unit.Text = animalDetails[6];
+            // Display calculated values
+            Animal tempAnimal = new Animal(id, name, species, age, score, "", "");
+            tempAnimal.CalculateStatusAndHousing();
+            txt_Animal_Status.Text = tempAnimal.Status;
+            txt_Housing_Unit.Text = tempAnimal.Housingunit;
         }
+
         private void ClearFields()
         {// begin method ClearFields
 
@@ -152,19 +165,18 @@ namespace PRG272_Project
 
             AnimalDataAccessLayer animalDAL = new AnimalDataAccessLayer();
 
-            // Check For Duplicate Animal ID
-
-            if ((!isUpdateMode ||
-                 !animal.AnimalID.Equals(originalAnimalID,
-                     StringComparison.OrdinalIgnoreCase))
-                && animalDAL.AnimalIDExists(animal.AnimalID))
+            // Check For Duplicate Animal ID (Only when adding a new record)
+            if (!isEditMode)
             {
-                MessageBox.Show("Animal ID already exists.", "Duplicate Record",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (animalDAL.AnimalIDExists(animal.AnimalID))
+                {// begin
+                    MessageBox.Show("Animal ID already exists.", "Duplicate Record",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                txtAnimal_ID.Focus();
+                    txtAnimal_ID.Focus();
 
-                return;
+                    return;
+                }// end 
             }
 
             // Calculate Status And Housing Unit
@@ -177,38 +189,43 @@ namespace PRG272_Project
 
             txt_Housing_Unit.Text = animal.Housingunit;
 
-            // Save Animal
+            // Save Animal (Handle Edit vs Add)
 
-            if (isUpdateMode)
+            bool success = false;
+
+            if (isEditMode)
             {
-                if (animalDAL.UpdateAnimal(originalAnimalID, animal))
-                {
-                    MessageBox.Show("Animal updated successfully.", "Success",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                success = animalDAL.UpdateAnimal(originalAnimalID, animal);
+            }
+            else
+            {
+                success = animalDAL.AddAnimal(animal);
+            }
 
+            if (success)
+            {// begin
+                MessageBox.Show(isEditMode ? "Animal updated successfully." : "Animal added successfully.", "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                if (isEditMode)
+                {
+                    // If updating, return directly to the manage page
+                    this.DialogResult = DialogResult.OK;
                     this.Close();
                 }
                 else
                 {
-                    MessageBox.Show("Animal could not be updated.", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // If adding a new record, go back to the main page
+                    Form1 frmMain = new Form1();
+                    frmMain.Show();
+                    this.Close();
                 }
-            }
+            }// end 
             else
-            {
-                if (animalDAL.AddAnimal(animal))
-                {
-                    MessageBox.Show("Animal added successfully.", "Success",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    ClearFields();
-                }
-                else
-                {
-                    MessageBox.Show("Animal could not be added to the text file.", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            {// begin
+                MessageBox.Show("Animal could not be saved to the text file.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }// end
 
         }// end save button
 

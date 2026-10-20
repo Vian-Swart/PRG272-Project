@@ -137,5 +137,12 @@ namespace PRG272_Project
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
         }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Form1 frmMain = new Form1();
+            frmMain.Show();
+            this.Close();
+        }
     }
 }
