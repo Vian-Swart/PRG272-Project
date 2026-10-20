@@ -9,12 +9,33 @@ namespace PRG272_Project
     public partial class frmAddAnimal : Form
     {// begin public partial class
 
-        public frmAddAnimal()
-        {// begin constructor
+        
+    private bool isUpdateMode = false;
+    private string originalAnimalID = "";
 
-            InitializeComponent();
+    public frmAddAnimal()
+    {
+         InitializeComponent();
+    }
 
-        }// end constructor
+    
+public frmAddAnimal(string[] animalDetails)
+{
+    InitializeComponent();
+
+    isUpdateMode = true;
+    originalAnimalID = animalDetails[0];
+
+    txtAnimal_ID.Text = animalDetails[0];
+    txtAnimal_Name.Text = animalDetails[1];
+    txtAnimal_Species.Text = animalDetails[2];
+    txtAnimal_Age.Text = animalDetails[3];
+    txtAnimal_Recovery_Score.Text = animalDetails[4];
+    txt_Animal_Status.Text = animalDetails[5];
+    txt_Housing_Unit.Text = animalDetails[6];
+}
+
+
 
         private void ClearFields()
         {// begin method ClearFields
@@ -137,15 +158,28 @@ namespace PRG272_Project
 
             // Check For Duplicate Animal ID
 
-            if (animalDAL.AnimalIDExists(animal.AnimalID))
-            {// begin
-                MessageBox.Show("Animal ID already exists.", "Duplicate Record",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            
+if (!isUpdateMode && animalDAL.AnimalIDExists(animal.AnimalID))
+{
+    MessageBox.Show("Animal ID already exists.", "Duplicate Record",
+        MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                txtAnimal_ID.Focus();
+    txtAnimal_ID.Focus();
+    return;
+}
 
-                return;
-            }// end 
+// In update mode, prevent changing the ID to one already used by another animal.
+if (isUpdateMode &&
+    !animal.AnimalID.Equals(originalAnimalID, StringComparison.OrdinalIgnoreCase) &&
+    animalDAL.AnimalIDExists(animal.AnimalID))
+{
+    MessageBox.Show("That Animal ID already belongs to another animal.",
+        "Duplicate Record", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+    txtAnimal_ID.Focus();
+    return;
+} // end
+
 
             // Calculate Status And Housing Unit
 
@@ -157,20 +191,47 @@ namespace PRG272_Project
 
             txt_Housing_Unit.Text = animal.Housingunit;
 
-            // Save Animal
+    
+            // Save or Update Animal
 
-            if (animalDAL.AddAnimal(animal))
-            {// begin
-                MessageBox.Show("Animal added successfully.", "Success",
-                    MessageBoxButtons.OK,MessageBoxIcon.Information);
+            bool success;
+
+            if (isUpdateMode)
+            {
+                success = animalDAL.UpdateAnimal(originalAnimalID, animal);
+            }
+            else
+            {
+                success = animalDAL.AddAnimal(animal);
+            }
+
+            if (success)
+            {
+                string message = isUpdateMode
+                    ? "Animal updated successfully."
+                    : "Animal added successfully.";
+
+                MessageBox.Show(message, "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 ClearFields();
-            }// end 
+
+                if (isUpdateMode)
+                {
+                    this.Close();
+                }
+            }
             else
-            {// begin
-                MessageBox.Show("Animal could not be added to the text file.","Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }// end 
+            {
+                MessageBox.Show(
+                    isUpdateMode
+                        ? "Animal could not be updated."
+                        : "Animal could not be added to the text file.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+
 
         }// end save button
 

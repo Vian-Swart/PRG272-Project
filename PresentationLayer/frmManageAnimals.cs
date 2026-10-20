@@ -11,16 +11,33 @@ using System.Windows.Forms;
 
 namespace PRG272_Project.PresentationLayer
 {
-    public partial class frmManageAnimals: Form
+    public partial class frmManageAnimals : Form
     {
         public frmManageAnimals()
         {
             InitializeComponent();
-
+            dgvAnimals.Dock = DockStyle.Fill;
             SetupGridColumns();
-
+            AddUpdateButton();
             LoadAnimalData();
         }
+
+
+        private void AddUpdateButton()
+        {
+            Button btnUpdate = new Button();
+
+            btnUpdate.Name = "btnUpdate";
+            btnUpdate.Text = "UPDATE ANIMAL";
+            btnUpdate.Height = 40;
+            btnUpdate.Dock = DockStyle.Bottom;
+
+            btnUpdate.Click += btnUpdate_Click;
+
+            this.Controls.Add(btnUpdate);
+            btnUpdate.BringToFront();
+        }
+
 
         private void SetupGridColumns()
         {
@@ -39,8 +56,30 @@ namespace PRG272_Project.PresentationLayer
             dgvAnimals.Columns.Add("HousingUnit", "Housing Unit");
         }
 
+
         private void LoadAnimalData()
         {
+    
+            string filePath = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "animals.txt");
+                
+                MessageBox.Show("Grid is reading from:\n" + filePath);
+
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show("animals.txt could not be found.",
+                    "File Not Found",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            dgvAnimals.Rows.Clear();
+
+            try
+            {
+                foreach (string line in File.ReadLines(filePath))
             string fileName = "animals.txt";
             string filePath = null;
 
@@ -97,6 +136,8 @@ namespace PRG272_Project.PresentationLayer
 
                     string[] parts = line.Split('|');
 
+                    if (details.Length == 7)
+                        dgvAnimals.Rows.Add(details);
                     if (parts.Length >= 7)
                     {
                         dgvAnimals.Rows.Add(
@@ -113,13 +154,45 @@ namespace PRG272_Project.PresentationLayer
             }
             catch (Exception ex)
             {
+                MessageBox.Show("Unable to read animal records: " + ex.Message);
+            }
+        }
+
+
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            if (dgvAnimals.SelectedRows.Count == 0)
+            {
                 MessageBox.Show(
+                    "Please select an animal from the grid first.",
+                    "No Animal Selected",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
+                return;
                     "Error loading animal records: " + ex.Message,
                     "Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
             }
+
+            string[] animalDetails = new string[7];
+
+            for (int i = 0; i < 7; i++)
+            {
+                animalDetails[i] =
+                    Convert.ToString(dgvAnimals.SelectedRows[0].Cells[i].Value);
+            }
+
+            using (frmAddAnimal editForm = new frmAddAnimal(animalDetails))
+            {
+                editForm.ShowDialog();
+            }
+
+            LoadAnimalData();
         }
+
     }
 }
