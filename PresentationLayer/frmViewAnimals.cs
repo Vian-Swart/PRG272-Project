@@ -12,9 +12,16 @@ namespace PRG272_Project
         {
             InitializeComponent();
 
-            textFilePath = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "animals.txt");
+            try
+            {
+                string projectDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.FullName;
+                textFilePath = Path.Combine(projectDirectory, "animals.txt");
+            }
+            catch
+            {
+                // Fallback to startup path if parent resolution fails
+                textFilePath = Path.Combine(Application.StartupPath, "animals.txt");
+            }
         }
 
         private void frmViewAnimals_Load(object sender, EventArgs e)
