@@ -9,6 +9,8 @@ namespace PRG272_Project
     public partial class frmAddAnimal : Form
     {// begin public partial class
 
+        private bool isUpdateMode = false;
+        private string originalAnimalID = "";
         public frmAddAnimal()
         {// begin constructor
 
@@ -16,6 +18,21 @@ namespace PRG272_Project
 
         }// end constructor
 
+        public frmAddAnimal(string[] animalDetails)
+        {
+            InitializeComponent();
+
+            isUpdateMode = true;
+            originalAnimalID = animalDetails[0];
+
+            txtAnimal_ID.Text = animalDetails[0];
+            txtAnimal_Name.Text = animalDetails[1];
+            txtAnimal_Species.Text = animalDetails[2];
+            txtAnimal_Age.Text = animalDetails[3];
+            txtAnimal_Recovery_Score.Text = animalDetails[4];
+            txt_Animal_Status.Text = animalDetails[5];
+            txt_Housing_Unit.Text = animalDetails[6];
+        }
         private void ClearFields()
         {// begin method ClearFields
 
@@ -55,8 +72,8 @@ namespace PRG272_Project
                 txtAnimal_Age.Text.Trim(),
                 out age))
             {// begin
-                MessageBox.Show("Age must be a valid integer.","Validation Error",
-                    MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                MessageBox.Show("Age must be a valid integer.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 txtAnimal_Age.Focus();
 
@@ -67,7 +84,7 @@ namespace PRG272_Project
                 txtAnimal_Recovery_Score.Text.Trim(),
                 out recoveryscore))
             {// begin 
-                MessageBox.Show ("Recovery Score must be a valid integer.","Validation Error",
+                MessageBox.Show("Recovery Score must be a valid integer.", "Validation Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 txtAnimal_Recovery_Score.Focus();
@@ -77,14 +94,14 @@ namespace PRG272_Project
 
             // Create Animal Object
 
-            Animal animal = new Animal(animalID, animalName, species, age, recoveryscore, "","");
+            Animal animal = new Animal(animalID, animalName, species, age, recoveryscore, "", "");
 
             // Business Layer Validation
 
             if (!animal.ValidateAnimalID())
             {// begin
-                MessageBox.Show("Animal ID must be in the format WR-XXXX where X represents a number.","Validation Error",
-                    MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                MessageBox.Show("Animal ID must be in the format WR-XXXX where X represents a number.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 txtAnimal_ID.Focus();
 
@@ -103,8 +120,8 @@ namespace PRG272_Project
 
             if (!animal.ValidateSpecies())
             {// begin
-                MessageBox.Show("Species is invalid.","Validation Error",
-                    MessageBoxButtons.OK,MessageBoxIcon.Warning);
+                MessageBox.Show("Species is invalid.", "Validation Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 txtAnimal_Species.Focus();
 
@@ -137,15 +154,18 @@ namespace PRG272_Project
 
             // Check For Duplicate Animal ID
 
-            if (animalDAL.AnimalIDExists(animal.AnimalID))
-            {// begin
+            if ((!isUpdateMode ||
+                 !animal.AnimalID.Equals(originalAnimalID,
+                     StringComparison.OrdinalIgnoreCase))
+                && animalDAL.AnimalIDExists(animal.AnimalID))
+            {
                 MessageBox.Show("Animal ID already exists.", "Duplicate Record",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 txtAnimal_ID.Focus();
 
                 return;
-            }// end 
+            }
 
             // Calculate Status And Housing Unit
 
@@ -159,18 +179,36 @@ namespace PRG272_Project
 
             // Save Animal
 
-            if (animalDAL.AddAnimal(animal))
-            {// begin
-                MessageBox.Show("Animal added successfully.", "Success",
-                    MessageBoxButtons.OK,MessageBoxIcon.Information);
+            if (isUpdateMode)
+            {
+                if (animalDAL.UpdateAnimal(originalAnimalID, animal))
+                {
+                    MessageBox.Show("Animal updated successfully.", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                ClearFields();
-            }// end 
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Animal could not be updated.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
             else
-            {// begin
-                MessageBox.Show("Animal could not be added to the text file.","Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }// end 
+            {
+                if (animalDAL.AddAnimal(animal))
+                {
+                    MessageBox.Show("Animal added successfully.", "Success",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    ClearFields();
+                }
+                else
+                {
+                    MessageBox.Show("Animal could not be added to the text file.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
 
         }// end save button
 
